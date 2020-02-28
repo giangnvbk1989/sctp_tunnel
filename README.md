@@ -18,7 +18,7 @@ This repository contains a client-server light-weight application implemented in
 ### Build
 To build the project use:
 ```
-./build
+./build.sh
 ```
 
 ### How to use
@@ -32,7 +32,7 @@ Before run SCTP Client, both parts of the tunnel have to be running.
 Where:
 - *TUNNEL_SERVER_IP*: Tunnel Server IP
 - *TUNNEL_SERVER_PORT*: Port in which Tunnel Server is listening for TCP connections.
-- *SCTP_IP*: Is the IP where the Tunnel Client is listening upcomming SCTP client connections.
+- *SCTP_IP*: Is the IP where the Tunnel Client is listening upcoming SCTP client connections.
 - *SCTP_PORT*: Port in which Tunnel Client receives SCTP messages from the SCTP Client (Same as SCTP Server Port).
 
 #### Run Tunnel Server
