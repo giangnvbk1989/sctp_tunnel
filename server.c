@@ -4,11 +4,12 @@
 #include <unistd.h>
 #include <errno.h>
 #include <string.h>
-#include<pthread.h>
+#include <pthread.h>
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <netinet/sctp.h>
+#include <netdb.h>
 #include <arpa/inet.h>
 #include <sys/wait.h>
 #include <signal.h>
@@ -99,17 +100,16 @@ int main(int argc, char const *argv[])
     struct sockaddr_in my_addr, remote_addr;
     struct sockaddr_in sctp_server_addr;
 
-
-
     if(argc != 5)
     {
         printf("USE: ./server <TUNNEL_IP> <TUNNEL_PORT> <SCTP_SERVER_IP> <SCTP_SERVER_PORT>\n");
         exit(1);
     }
+
     /* Getting parameters */
     tunnel_ip = argv[1];
     tunnel_port = atoi(argv[2]);
-    sctp_server_ip = argv[3];
+    sctp_server_ip = gethostbyname(argv[3])->h_name;
     sctp_server_port = atoi(argv[4]);
 
     /* Ctrl + c signal handler */
@@ -118,7 +118,7 @@ int main(int argc, char const *argv[])
     /*
     * Tunnel Socket Set Up
     */
-    /* Creating TCP socket*/ 
+    /* Creating TCP socket*/
     sock = socket(AF_INET, SOCK_STREAM, 0);
     if(sock == -1)
     {
@@ -131,7 +131,7 @@ int main(int argc, char const *argv[])
     my_addr.sin_addr.s_addr = inet_addr(tunnel_ip);
     my_addr.sin_port = htons(tunnel_port);
     memset(&(my_addr.sin_zero), 0, 8);
-    
+
     /*Binding*/
     if(bind(sock, (struct sockaddr *) &my_addr, sizeof(struct sockaddr)) == -1)
     {
