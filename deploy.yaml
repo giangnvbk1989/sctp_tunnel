@@ -11,7 +11,7 @@ spec:
   ports:
     - protocol: TCP
       port: 5000
-      targetPort: 5000
+      nodePort: 31358
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -31,11 +31,11 @@ spec:
     spec:
       containers:
         - name: sctp-tunnel
-          image: notexactlyawe/sctp-tunnel
+          image: notexactlyawe/sctp_tunnel
           ports:
             - containerPort: 5000
           env:
             - name: SCTP_IP
-              value: "oai-mme"
+              value: "oai-mme.oai"
             - name: SCTP_PORT
-              value: 3868
+              value: "36412"
