@@ -93,12 +93,14 @@ void * uplink_thread()
 int main(int argc, char const *argv[])
 {
     int addrlen, bytes_readed, i;
-    const char * tunnel_ip, * sctp_server_ip;
+    const char * tunnel_ip, * sctp_server_name;
     int tunnel_port, sctp_server_port;
     pthread_t downlink_id, uplink_id;
     struct sctp_event_subscribe events;
     struct sockaddr_in my_addr, remote_addr;
     struct sockaddr_in sctp_server_addr;
+    // IPV4 address max 15 chars
+    char sctp_server_ip[16];
 
     if(argc != 5)
     {
@@ -109,13 +111,29 @@ int main(int argc, char const *argv[])
     /* Getting parameters */
     tunnel_ip = argv[1];
     tunnel_port = atoi(argv[2]);
-    sctp_server_ip = gethostbyname(argv[3])->h_addr_list[0];
+    sctp_server_name = argv[3];
     sctp_server_port = atoi(argv[4]);
 
-    printf("Config:\ntunnel_ip: %s\ntunnel_port: %d\nsctp_server_ip: %u.%u.%u.%u\nsctp_server_port: %d\n",
-            tunnel_ip, tunnel_port,
-            sctp_server_ip[0], sctp_server_ip[1], sctp_server_ip[2], sctp_server_ip[3],
-            sctp_server_port);
+    // convert server name to ip
+    struct addrinfo *sctp_server_addrinfo;
+    int error = getaddrinfo(sctp_server_name, NULL, NULL, &sctp_server_addrinfo);
+    if (error != 0) {
+        perror("getaddrinfo");
+        exit(1);
+    } else if (sctp_server_addrinfo->ai_family != AF_INET) {
+        printf("SCTP server resolved address was IPV6, exiting\n");
+        exit(1);
+    }
+
+    error = getnameinfo(sctp_server_addrinfo->ai_addr, sizeof(struct sockaddr), sctp_server_ip,
+                        16, NULL, 0, NI_NUMERICHOST);
+    if (error != 0) {
+        perror("getnameinfo");
+        exit(1);
+    }
+
+    printf("Config:\ntunnel_ip: %s\ntunnel_port: %d\nsctp_server_ip: %s\nsctp_server_port: %d\n",
+            tunnel_ip, tunnel_port, sctp_server_ip, sctp_server_port);
 
     /* Ctrl + c signal handler */
     signal(SIGINT, sigint_handler);
