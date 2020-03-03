@@ -109,8 +109,13 @@ int main(int argc, char const *argv[])
     /* Getting parameters */
     tunnel_ip = argv[1];
     tunnel_port = atoi(argv[2]);
-    sctp_server_ip = gethostbyname(argv[3])->h_name;
+    sctp_server_ip = gethostbyname(argv[3])->h_addr_list[0];
     sctp_server_port = atoi(argv[4]);
+
+    printf("Config:\ntunnel_ip: %s\ntunnel_port: %d\nsctp_server_ip: %u.%u.%u.%u\nsctp_server_port: %d\n",
+            tunnel_ip, tunnel_port,
+            sctp_server_ip[0], sctp_server_ip[1], sctp_server_ip[2], sctp_server_ip[3],
+            sctp_server_port);
 
     /* Ctrl + c signal handler */
     signal(SIGINT, sigint_handler);
